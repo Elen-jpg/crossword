@@ -1,0 +1,545 @@
+<!DOCTYPE html>
+<html lang="ka">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ისტორიის ქვიზ-პორტალი</title>
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    }
+    body {
+      background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+      color: #333;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      min-height: 100vh;
+      padding: 20px;
+    }
+    
+    .top-nav {
+      width: 100%;
+      max-width: 950px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 20px;
+    }
+    .lang-switcher {
+      display: flex;
+      gap: 8px;
+      background: rgba(255, 255, 255, 0.2);
+      padding: 4px;
+      border-radius: 20px;
+      backdrop-filter: blur(5px);
+    }
+    .lang-btn {
+      border: none;
+      background: transparent;
+      color: white;
+      padding: 6px 14px;
+      font-weight: bold;
+      border-radius: 16px;
+      cursor: pointer;
+      transition: all 0.3s;
+    }
+    .lang-btn.active {
+      background: #f39c12;
+      color: white;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+    }
+
+    header {
+      text-align: center;
+      color: white;
+      margin-bottom: 25px;
+    }
+    h1 {
+      font-size: 2.3rem;
+      margin-bottom: 8px;
+      text-shadow: 0 2px 4px rgba(0,0,0,0.3);
+    }
+    p.subtitle {
+      font-size: 1.1rem;
+      opacity: 0.9;
+    }
+
+    .screen {
+      width: 100%;
+      max-width: 950px;
+      background: white;
+      padding: 35px;
+      border-radius: 16px;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.25);
+      animation: fadeIn 0.4s ease-in-out;
+    }
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    .hidden {
+      display: none !important;
+    }
+
+    /* Topics Grid */
+    .topics-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+      gap: 15px;
+      margin-top: 20px;
+    }
+    .topic-card {
+      background: #f8fafc;
+      border: 2px solid #e2e8f0;
+      border-radius: 12px;
+      padding: 18px 15px;
+      text-align: left;
+      font-weight: bold;
+      font-size: 1.05rem;
+      color: #1e293b;
+      cursor: pointer;
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .topic-card .title-group {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .topic-card .icon {
+      font-size: 1.5rem;
+    }
+    .topic-card .badge {
+      background: #1e293b;
+      color: white;
+      font-size: 0.75rem;
+      padding: 4px 8px;
+      border-radius: 6px;
+    }
+    .topic-card:hover {
+      background: #3b82f6;
+      color: white;
+      border-color: #2563eb;
+      transform: translateY(-3px);
+      box-shadow: 0 8px 20px rgba(59, 130, 246, 0.25);
+    }
+    .topic-card:hover .badge {
+      background: white;
+      color: #1e293b;
+    }
+
+    /* Game Controls */
+    .game-bar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 25px;
+      border-bottom: 2px solid #f1f5f9;
+      padding-bottom: 15px;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+    .btn {
+      background: #3b82f6;
+      color: white;
+      border: none;
+      padding: 10px 22px;
+      font-size: 1rem;
+      border-radius: 8px;
+      cursor: pointer;
+      font-weight: bold;
+      transition: all 0.2s;
+      box-shadow: 0 4px 10px rgba(59, 130, 246, 0.2);
+    }
+    .btn:hover {
+      background: #2563eb;
+      transform: translateY(-1px);
+    }
+    .btn-secondary {
+      background: #64748b;
+      box-shadow: 0 4px 10px rgba(100, 116, 139, 0.2);
+    }
+    .btn-secondary:hover {
+      background: #475569;
+    }
+
+    /* Quiz Questions */
+    .quiz-container {
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+    }
+    .question-item {
+      background: #f8fafc;
+      border-left: 5px solid #3b82f6;
+      padding: 18px 22px;
+      border-radius: 8px;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.03);
+    }
+    .question-text {
+      font-weight: 600;
+      margin-bottom: 12px;
+      font-size: 1.1rem;
+      color: #1e293b;
+    }
+    .input-answer {
+      width: 100%;
+      max-width: 350px;
+      padding: 10px 14px;
+      font-size: 1rem;
+      border: 2px solid #cbd5e1;
+      border-radius: 6px;
+      outline: none;
+      transition: border 0.2s;
+    }
+    .input-answer:focus {
+      border-color: #3b82f6;
+    }
+    .input-answer.correct {
+      border-color: #10b981;
+      background-color: #ecfdf5;
+      color: #065f46;
+      font-weight: bold;
+    }
+    .input-answer.incorrect {
+      border-color: #ef4444;
+      background-color: #fef2f2;
+      color: #991b1b;
+    }
+
+    .score-board {
+      margin-top: 30px;
+      padding: 20px;
+      background: #e0f2fe;
+      border-radius: 10px;
+      text-align: center;
+      font-size: 1.4rem;
+      font-weight: bold;
+      color: #0369a1;
+      animation: fadeIn 0.3s ease;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="top-nav">
+    <div style="color: white; font-weight: bold; font-size: 1.3rem;">🏛️ ისტორიის ქვიზ-პორტალი</div>
+    <div class="lang-switcher">
+      <button class="lang-btn active" id="btn-ka" onclick="setLanguage('ka')">GE</button>
+      <button class="lang-btn" id="btn-en" onclick="setLanguage('en')">EN</button>
+    </div>
+  </div>
+
+  <header>
+    <h1 id="app-title">🏛️ ისტორიის ქვიზ-პორტალი</h1>
+    <p class="subtitle" id="app-subtitle">აბიტურიენტებისა და სტუდენტებისთვის</p>
+  </header>
+
+  <!-- 1. თემების არჩევის გვერდი -->
+  <div id="topics-screen" class="screen">
+    <h2 id="select-topic-txt" style="margin-bottom: 15px; color: #1e293b;">აირჩიეთ ისტორიული თემა:</h2>
+    <div id="topics-grid" class="topics-grid"></div>
+  </div>
+
+  <!-- 2. თამაშის გვერდი -->
+  <div id="game-screen" class="screen hidden">
+    <div class="game-bar">
+      <button class="btn btn-secondary" id="back-btn" onclick="showTopics()">← თემებში დაბრუნება</button>
+      <h2 id="current-topic-title" style="color: #1e293b;">თემის სახელი</h2>
+      <button class="btn" id="refresh-btn" onclick="startNewGame()">ახალი კითხვები 🔄</button>
+    </div>
+
+    <div id="quiz-container" class="quiz-container"></div>
+
+    <div style="margin-top: 35px; text-align: center;">
+      <button class="btn" id="check-btn" style="background: #10b981; font-size: 1.2rem; padding: 12px 35px;" onclick="checkAnswers()">შემოწმება</button>
+    </div>
+
+    <div id="score-board" class="score-board hidden"></div>
+  </div>
+
+  <script>
+    let currentLang = 'ka';
+    let selectedTopic = null;
+    let currentQuestions = [];
+
+    const i18n = {
+      ka: {
+        title: "🏛️ ისტორიის ქვიზ-პორტალი",
+        subtitle: "აბიტურიენტებისა და სტუდენტებისთვის",
+        selectTopic: "აირჩიეთ ისტორიული თემა:",
+        backBtn: "← თემებში დაბრუნება",
+        refreshBtn: "ახალი კითხვები 🔄",
+        checkBtn: "შემოწმება",
+        placeholder: "პასუხი...",
+        correctText: "სწორია",
+        badgeText: "ყველა კითხვა",
+        scoreText: "თქვენ დააგროვეთ:"
+      },
+      en: {
+        title: "🏛️ History Quiz Portal",
+        subtitle: "For High School Students & Undergraduates",
+        selectTopic: "Select a Historical Topic:",
+        backBtn: "← Back to Topics",
+        refreshBtn: "New Questions 🔄",
+        checkBtn: "Check Answers",
+        placeholder: "Your answer...",
+        correctText: "Correct",
+        badgeText: "All Questions",
+        scoreText: "Your score:"
+      }
+    };
+
+    const quizData = [
+      {
+        id: "geo_history",
+        icon: "🏰",
+        title: { ka: "საქართველოს ისტორია", en: "History of Georgia" },
+        questions: [
+          { q: { ka: "საქართველოს პირველი ქრისტიანი მეფე.", en: "First Christian king of Georgia." }, a: { ka: "მირიანი", en: "Mirian" } },
+          { q: { ka: "1121 წლის 12 აგვისტოს ბრძოლა.", en: "Battle on August 12, 1121." }, a: { ka: "დიდგორი", en: "Didgori" } },
+          { q: { ka: "დასავლეთ საქართველოს უძველესი სამეფო (ცენტრი ციხე-გოჯი).", en: "Ancient kingdom in Western Georgia." }, a: { ka: "ლაზიკა", en: "Lazica" } },
+          { q: { ka: "მეფე, რომელმაც XII საუკუნეში თბილისი დედაქალაქად აქცია.", en: "King who made Tbilisi the capital." }, a: { ka: "დავითი", en: "David" } },
+          { q: { ka: "ქართველი დედოფალი ოქროს ხანის ზენიტში.", en: "Georgian Queen during the Golden Age." }, a: { ka: "თამარი", en: "Tamar" } },
+          { q: { ka: "1795 წელს აღა-მაჰმად-ხანის შემოჭრისას მომხდარი ბრძოლა.", en: "Battle during Agha Mohammad Khan's invasion." }, a: { ka: "კრწანისი", en: "Krtsanisi" } },
+          { q: { ka: "ქართლ-კახეთის უკანასკნელი მეფე 1801 წლამდე.", en: "Last king of Kartli-Kakheti." }, a: { ka: "გიორგი", en: "George" } },
+          { q: { ka: "1832 წლის შეთქმულების მონაწილე ცნობილი პოეტი.", en: "Famous poet in the 1832 conspiracy." }, a: { ka: "ორბელიანი", en: "Orbeliani" } },
+          { q: { ka: "1918 წლის 26 მაისს გამოცხადებული საქართველოს...", en: "Declared on May 26, 1918." }, a: { ka: "რესპუბლიკა", en: "Republic" } },
+          { q: { ka: "„თერგდალეულთა“ ლიდერი და საზოგადო მოღვაწე.", en: "Leader of Tergdaleulebi." }, a: { ka: "ჭავჭავაძე", en: "Chavchavadze" } }
+        ]
+      },
+      {
+        id: "egypt_mesopotamia",
+        icon: "🏺",
+        title: { ka: "ეგვიპტე და შუამდინარეთი", en: "Egypt & Mesopotamia" },
+        questions: [
+          { q: { ka: "შუამდინარეთში შექმნილი უძველესი დამწერლობა.", en: "Ancient writing system of Mesopotamia." }, a: { ka: "ლურსმნული", en: "Cuneiform" } },
+          { q: { ka: "ეგვიპტის ფარაონი, რომელმაც ერთღმერთიანობა გამოაცხადა.", en: "Pharaoh who introduced monotheism." }, a: { ka: "ახენატონი", en: "Akhenaten" } },
+          { q: { ka: "ბაბილონის მეფე, ცნობილი კანონთა კრებულით.", en: "Babylonian king famous for his legal code." }, a: { ka: "ჰამურაბი", en: "Hammurabi" } },
+          { q: { ka: "ძველი ეგვიპტური პიქტოგრაფიული დამწერლობა.", en: "Ancient Egyptian writing system." }, a: { ka: "იეროგლიფი", en: "Hieroglyph" } },
+          { q: { ka: "მდინარე, რომლის ნაპირებზეც აღმოცენდა ეგვიპტე.", en: "River along which Egypt developed." }, a: { ka: "ნილოსი", en: "Nile" } },
+          { q: { ka: "უძველესი შუმერული საფეხუროვანი ტაძარი.", en: "Sumerian stepped temple tower." }, a: { ka: "ზიკურათი", en: "Ziggurat" } },
+          { q: { ka: "ფარაონი, რომლის ხელუხლებელი სამარხი იპოვეს 1922 წელს.", en: "Pharaoh whose intact tomb was found in 1922." }, a: { ka: "ტუტანხამონი", en: "Tutankhamun" } }
+        ]
+      },
+      {
+        id: "greece",
+        icon: "🏛️",
+        title: { ka: "ძველი საბერძნეთი", en: "Ancient Greece" },
+        questions: [
+          { q: { ka: "ძველი ბერძნული ქალაქი — დემოკრატიის აკვანი.", en: "Cradle of democracy in Greece." }, a: { ka: "ათენი", en: "Athens" } },
+          { q: { ka: "ათენის მთავარი სამხედრო მეტოქე ქალაქი.", en: "Military rival of Athens." }, a: { ka: "სპარტა", en: "Sparta" } },
+          { q: { ka: "მაკედონიის მეფე, უზარმაზარი იმპერიის დამაარსებელი.", en: "Macedonian king who conquered Persia." }, a: { ka: "ალექსანდრე", en: "Alexander" } },
+          { q: { ka: "300 სპარტელის გმირული ბრძოლის ადგილი.", en: "Site of the heroic 300 Spartans stand." }, a: { ka: "თერმოპილე", en: "Thermopylae" } },
+          { q: { ka: "ბერძნული ქალაქ-სახელმწიფოს აღმნიშვნელური ტერმინი.", en: "Greek city-state term." }, a: { ka: "პოლისი", en: "Polis" } }
+        ]
+      },
+      {
+        id: "rome",
+        icon: "🏛️",
+        title: { ka: "ძველი რომი", en: "Ancient Rome" },
+        questions: [
+          { q: { ka: "რომაელი დიქტატორი, მოკლული ძვ.წ. 44 წელს.", en: "Roman dictator assassinated in 44 BC." }, a: { ka: "კეისარი", en: "Caesar" } },
+          { q: { ka: "რომის პირველი იმპერატორი.", en: "First Emperor of Rome." }, a: { ka: "ავგუსტუსი", en: "Augustus" } },
+          { q: { ka: "რომაული ამფითეატრი გლადიატორთა ბრძოლებისთვის.", en: "Roman amphitheater for gladiators." }, a: { ka: "კოლიზეუმი", en: "Colosseum" } },
+          { q: { ka: "კართაგენელი მხედართმთავარი, რომელმაც ალპები გადალახა.", en: "Carthaginian general who crossed the Alps." }, a: { ka: "ჰანიბალი", en: "Hannibal" } },
+          { q: { ka: "რომაელი გლადიატორი, აჯანყების ლიდერი.", en: "Rebellious Roman gladiator leader." }, a: { ka: "სპარტაკი", en: "Spartacus" } }
+        ]
+      },
+      {
+        id: "crusades",
+        icon: "💧",
+        title: { ka: "ჯვაროსნული ომები", en: "The Crusades" },
+        questions: [
+          { q: { ka: "ქალაქი, რომლის განთავისუფლებაც იყო ჯვაროსანთა მთავარი მიზანი.", en: "City that was the primary goal of Crusaders." }, a: { ka: "იერუსალიმი", en: "Jerusalem" } },
+          { q: { ka: "რომის პაპი, რომელმაც 1095 წელს კლერმონის კრებაზე ჯვაროსნული ომი გამოაცხადა.", en: "Pope who called for the First Crusade in 1095." }, a: { ka: "ურბანი", en: "Urban" } },
+          { q: { ka: "მუსლიმი სარდალი და სულთანი, რომელმაც 1187 წელს იერუსალიმი დაიბრუნა.", en: "Muslim leader who recaptured Jerusalem in 1187." }, a: { ka: "სალადინი", en: "Saladin" } },
+          { q: { ka: "ინგლისის მეფე, ცნობილი „ლომგული“, III ჯვაროსნული ომის ლიდერი.", en: "English King 'Lionheart' of the 3rd Crusade." }, a: { ka: "რიჩარდი", en: "Richard" } },
+          { q: { ka: "ჯვაროსნული ორდენი, შექმნილი ტაძრის რაინდთა მიერ.", en: "Crusader order created by Knight Templars." }, a: { ka: "ტამპლიერები", en: "Templars" } }
+        ]
+      },
+      {
+        id: "islam_arab",
+        icon: "☪️",
+        title: { ka: "ისლამი და არაბთა დაპყრობები", en: "Islam & Arab Conquests" },
+        questions: [
+          { q: { ka: "მუსლიმთა წმინდა წიგნი.", en: "Holy book of Islam." }, a: { ka: "ყურანი", en: "Quran" } },
+          { q: { ka: "ისლამის დამაარსებელი წინასწარმეტყველი.", en: "Founder prophet of Islam." }, a: { ka: "მუჰამედი", en: "Muhammad" } },
+          { q: { ka: "მუსლიმური სახელმწიფოსა და საზოგადოების მეთაური.", en: "Head of the Muslim state and community." }, a: { ka: "ხალიფა", en: "Caliph" } },
+          { q: { ka: "ქალაქი, სადაც მუსლიმთა მთავარი წმინდა ადგილია.", en: "City housing the holiest Islamic site." }, a: { ka: "მექა", en: "Mecca" } },
+          { q: { ka: "არაბი სარდალი, რომელმაც VII საუკუნეში ქართლში „დაცვის სიგელი“ გაასცა.", en: "Arab general who issued the Protection Protection Charter in Kartli." }, a: { ka: "ჰაბიბი", en: "Habib" } }
+        ]
+      },
+      {
+        id: "mongol_empire",
+        icon: "⚔️",
+        title: { ka: "მონღოლთა იმპერია", en: "Mongol Empire" },
+        questions: [
+          { q: { ka: "მონღოლთა იმპერიის დამაარსებელი და დიდი ყაენი.", en: "Founder and Great Khan of Mongol Empire." }, a: { ka: "ჩინგიზყაენი", en: "Genghis" } },
+          { q: { ka: "მონღოლი სარდალი, რომელმაც XIV საუკუნეში საქართველო 8-ჯერ დაარბია.", en: "Conqueror who invaded Georgia 8 times in the 14th century." }, a: { ka: "თემურლენგი", en: "Tamerlane" } },
+          { q: { ka: "მონღოლთა სახელმწიფო ირანში (ხულაგუ ყაენის დაარსებული).", en: "Mongol state in Iran founded by Hulagu." }, a: { ka: "ილხანატი", en: "Ilkhanate" } },
+          { q: { ka: "მონღოლთა სათათბირო ყრილობა.", en: "Supreme council of Mongol chiefs." }, a: { ka: "ყურილთაი", en: "Kurultai" } },
+          { q: { ka: "მონღოლთა იმპერიის ჩრდილო-დასავლეთ ნაწილი.", en: "Northwestern division of the Mongol Empire." }, a: { ka: "ოქროსურდო", en: "GoldenHorde" } }
+        ]
+      },
+      {
+        id: "religious_wars",
+        icon: "⚔️",
+        title: { ka: "რელიგიური ომები ევროპაში", en: "Religious Wars in Europe" },
+        questions: [
+          { q: { ka: "გერმანელი რეფორმატორი, რომელმაც 1517 წელს 95 თეზისი გამოაქვეყნა.", en: "German reformer who posted 95 Theses in 1517." }, a: { ka: "ლუთერი", en: "Luther" } },
+          { q: { ka: "1618-1648 წლების დიდი ომი ევროპაში კათოლიკეებსა და პროტესტანტებს შორის.", en: "Major European conflict between 1618-1648." }, a: { ka: "ოცდაათწლიანი", en: "ThirtyYears" } },
+          { q: { ka: "1648 წელს დადებული ზავი, რომელმაც 30-წლიანი ომი დაასრულა.", en: "Peace treaty ending the Thirty Years' War in 1648." }, a: { ka: "ვესტფალიის", en: "Westphalia" } },
+          { q: { ka: "ფრანგი პროტესტანტების დასახელება.", en: "Name for French Protestants." }, a: { ka: "ჰუგენოტები", en: "Huguenots" } },
+          { q: { ka: "1572 წლის 24 აგვისტოს ჰუგენოტთა მასობრივი ჟლეტა პარიზში.", en: "Massacre of French Huguenots in 1572." }, a: { ka: "ბართლომეს", en: "Bartholomew" } }
+        ]
+      },
+      {
+        id: "ww1",
+        icon: "🪖",
+        title: { ka: "I მსოფლიო ომი", en: "World War I" },
+        questions: [
+          { q: { ka: "1918 წელს დადებული ზავი I მსოფლიო ომის ბოლოს.", en: "Treaty signed in 1918 ending WWI." }, a: { ka: "ვერსალის", en: "Versailles" } },
+          { q: { ka: "ავსტრიის ერცჰერცოგი, რომლის მკვლელობამაც ომი გამოიწვია.", en: "Archduke whose assassination triggered WWI." }, a: { ka: "ფერდინანდი", en: "Ferdinand" } },
+          { q: { ka: "სამხედრო ბლოკი: ბრიტანეთი, საფრანგეთი, რუსეთი.", en: "Alliance of Britain, France, and Russia." }, a: { ka: "ანტანტა", en: "Entente" } },
+          { q: { ka: "1916 წლის მასშტაბური ბრძოლა საფრანგეთში („ხორცსაკეპი“).", en: "Major 1916 battle in France." }, a: { ka: "ვერდენი", en: "Verdun" } }
+        ]
+      },
+      {
+        id: "ww2",
+        icon: "🪖",
+        title: { ka: "II მსოფლიო ომი", en: "World War II" },
+        questions: [
+          { q: { ka: "გერმანიის ფაშისტური დიქტატორი II მსოფლიო ომში.", en: "Dictator of Nazi Germany." }, a: { ka: "ჰიტლერი", en: "Hitler" } },
+          { q: { ka: "პირველი ატომური ბომბის სამიზნე ქალაქი იაპონიაში.", en: "Target city of the first atomic bomb." }, a: { ka: "ჰიროშიმა", en: "Hiroshima" } },
+          { q: { ka: "აშშ-ის საზღვაო ბაზა, რომელზეც იაპონია დაესხა თავს 1941 წელს.", en: "US naval base attacked by Japan in 1941." }, a: { ka: "პერლჰარბორი", en: "PearlHarbor" } },
+          { q: { ka: "II მსოფლიო ომის უდიდესი სატანკო ბრძოლა (1943).", en: "Largest tank battle in history (1943)." }, a: { ka: "კურსკი", en: "Kursk" } }
+        ]
+      },
+      {
+        id: "modern_history",
+        icon: "🗽",
+        title: { ka: "ევროპა-ამერიკის თანამედროვე ისტორია", en: "Modern Euro-American History" },
+        questions: [
+          { q: { ka: "1789 წლის ისტორიული დოკუმენტი საფრანგეთში.", en: "Historic French document from 1789." }, a: { ka: "დეკლარაცია", en: "Declaration" } },
+          { q: { ka: "აშშ-ის პრეზიდენტი, რომელმაც გააუქმა მონობა.", en: "US President who abolished slavery." }, a: { ka: "ლინკოლნი", en: "Lincoln" } },
+          { q: { ka: "საფრანგეთის იმპერატორი და მხედართმთავარი.", en: "French emperor and general." }, a: { ka: "ნაპოლეონი", en: "Napoleon" } },
+          { q: { ka: "1949 წელს შექმნილი ჩრდილოატლანტიკური ალიანსი.", en: "North Atlantic military alliance formed in 1949." }, a: { ka: "ნატო", en: "NATO" } },
+          { q: { ka: "1989 წელს დაცემული სიმბოლო გერმანიაში.", en: "Symbolic barrier that fell in 1989." }, a: { ka: "ბერლინისკედელი", en: "BerlinWall" } }
+        ]
+      },
+      {
+        id: "archaeology",
+        icon: "⛏️",
+        title: { ka: "არქეოლოგია", en: "Archaeology" },
+        questions: [
+          { q: { ka: "საქართველოში აღმოჩენილი უძველესი ევროპელის ნაშთები (დმანისი).", en: "Ancient hominin fossils found in Georgia (Dmanisi)." }, a: { ka: "ზეზვა", en: "Zezva" } },
+          { q: { ka: "ქვის ხანის პირველი და ყველაზე ხანგრძლივი პერიოდი.", en: "First and longest period of the Stone Age." }, a: { ka: "პალეოლითი", en: "Paleolithic" } },
+          { q: { ka: "ახალი ქვის ხანა, როდესაც დაიწყო მიწათმოქმედება.", en: "New Stone Age when agriculture began." }, a: { ka: "ნეოლითი", en: "Neolithic" } },
+          { q: { ka: "ქვის ფილა, რომლითაც გაიშიფრა ეგვიპტური იეროგლიფები.", en: "Key artifact used to decipher Egyptian hieroglyphs." }, a: { ka: "როზეტის", en: "Rosetta" } },
+          { q: { ka: "ძველი სამარხი ბორცვი, დამახასიათებელი ყორღანული კულტურისთვის.", en: "Ancient burial mound." }, a: { ka: "ყორღანი", en: "Kurgan" } }
+        ]
+      }
+    ];
+
+    function setLanguage(lang) {
+      currentLang = lang;
+      document.getElementById('btn-ka').classList.toggle('active', lang === 'ka');
+      document.getElementById('btn-en').classList.toggle('active', lang === 'en');
+      
+      document.getElementById('app-title').innerText = i18n[lang].title;
+      document.getElementById('app-subtitle').innerText = i18n[lang].subtitle;
+      document.getElementById('select-topic-txt').innerText = i18n[lang].selectTopic;
+      document.getElementById('back-btn').innerText = i18n[lang].backBtn;
+      document.getElementById('refresh-btn').innerText = i18n[lang].refreshBtn;
+      document.getElementById('check-btn').innerText = i18n[lang].checkBtn;
+
+      initTopics();
+      if (selectedTopic) {
+        document.getElementById('current-topic-title').innerText = selectedTopic.title[currentLang];
+        startNewGame();
+      }
+    }
+
+    function initTopics() {
+      const grid = document.getElementById('topics-grid');
+      grid.innerHTML = '';
+      quizData.forEach(topic => {
+        const card = document.createElement('div');
+        card.className = 'topic-card';
+        card.innerHTML = `
+          <div class="title-group">
+            <span class="icon">${topic.icon}</span> 
+            <span>${topic.title[currentLang]}</span>
+          </div>
+          <span class="badge">${i18n[currentLang].badgeText}</span>
+        `;
+        card.onclick = () => selectTopic(topic);
+        grid.appendChild(card);
+      });
+    }
+
+    function selectTopic(topic) {
+      selectedTopic = topic;
+      document.getElementById('topics-screen').classList.add('hidden');
+      document.getElementById('game-screen').classList.remove('hidden');
+      document.getElementById('current-topic-title').innerText = topic.title[currentLang];
+      startNewGame();
+    }
+
+    function showTopics() {
+      selectedTopic = null;
+      document.getElementById('game-screen').classList.add('hidden');
+      document.getElementById('topics-screen').classList.remove('hidden');
+    }
+
+    function startNewGame() {
+      document.getElementById('score-board').classList.add('hidden');
+      const shuffled = [...selectedTopic.questions].sort(() => 0.5 - Math.random());
+      currentQuestions = shuffled.slice(0, 10);
+
+      const container = document.getElementById('quiz-container');
+      container.innerHTML = '';
+
+      currentQuestions.forEach((item, index) => {
+        const div = document.createElement('div');
+        div.className = 'question-item';
+        div.innerHTML = `
+          <div class="question-text">${index + 1}. ${item.q[currentLang]}</div>
+          <input type="text" class="input-answer" id="ans-${index}" placeholder="${i18n[currentLang].placeholder}" autocomplete="off">
+        `;
+        container.appendChild(div);
+      });
+    }
+
+    function checkAnswers() {
+      let score = 0;
+      currentQuestions.forEach((item, index) => {
+        const input = document.getElementById(`ans-${index}`);
+        const userAns = input.value.trim().toLowerCase();
+        const correctAns = item.a[currentLang].toLowerCase();
+
+        if (userAns === correctAns) {
+          input.className = "input-answer correct";
+          score++;
+        } else {
+          input.className = "input-answer incorrect";
+          input.value = `${input.value} (${i18n[currentLang].correctText}: ${item.a[currentLang]})`;
+        }
+      });
+
+      const scoreBoard = document.getElementById('score-board');
+      scoreBoard.innerText = `${i18n[currentLang].scoreText} ${score} / ${currentQuestions.length}`;
+      scoreBoard.classList.remove('hidden');
+    }
+
+    initTopics();
+  </script>
+</body>
+</html>
